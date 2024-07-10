@@ -1,0 +1,21 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= Rails.application.credentials.dig(:database, :username) %>
+  password: <%= Rails.application.credentials.dig(:database, :password) %>
+  host: localhost
+
+development:
+  <<: *default
+  database: blog_api_development
+
+test:
+  <<: *default
+  database: blog_api_test
+
+production:
+  <<: *default
+  database: blog_api_production
+  #username: task_manager
+  #password: <%= ENV['TASK_MANAGER_DATABASE_PASSWORD'] %>
