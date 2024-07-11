@@ -4,8 +4,29 @@ class PostsController < ApplicationController
 
   # GET /posts or /posts.json
   def index
-    @posts = Post.all
-    render json: @posts
+    page = params[:page] || 1
+    per_page = params[:limit] || 5
+
+    if params[:year].present? && params[:month].present?
+      year = params[:year].to_i
+      month = params[:month].to_i
+      start_date = Date.new(year, month, 1)
+      end_date = start_date.end_of_month
+      @posts = Post.where(created_at: start_date..end_date)
+                   .paginate(page: page, per_page: per_page)
+                   .order(created_at: :desc)
+    else
+      @posts = Post.paginate(page: page, per_page: per_page)
+                   .order(created_at: :desc)
+    end
+
+    render json: {
+      posts: @posts,
+      total_pages: @posts.total_pages,
+      current_page: @posts.current_page,
+      next_page: @posts.next_page,
+      prev_page: @posts.previous_page
+    }
   end
 
   # GET /posts/1 or /posts/1.json
