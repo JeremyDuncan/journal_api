@@ -13,11 +13,13 @@ class PostsController < ApplicationController
       start_date = Date.new(year, month, 1)
       end_date = start_date.end_of_month
       @posts = Post.where(created_at: start_date..end_date)
+                   .includes(tags: :tag_type) # Preload associations to avoid N+1 queries
+                   .order(created_at: :desc)
                    .paginate(page: page, per_page: per_page)
-                   .order(created_at: :desc)
     else
-      @posts = Post.paginate(page: page, per_page: per_page)
+      @posts = Post.includes(tags: :tag_type) # Preload associations to avoid N+1 queries
                    .order(created_at: :desc)
+                   .paginate(page: page, per_page: per_page)
     end
 
     render json: {
@@ -75,13 +77,13 @@ class PostsController < ApplicationController
     head :no_content
   end
 
-
   # GET /posts/search or /posts/search.json
   def search
     query = params[:query]
     @posts = Post.joins(tags: :tag_type)
                  .where('posts.title ILIKE :query OR posts.content ILIKE :query OR tags.name ILIKE :query OR tag_types.name ILIKE :query', query: "%#{query}%")
                  .distinct
+                 .includes(tags: :tag_type) # Preload associations to avoid N+1 queries
                  .order(created_at: :desc)
                  .paginate(page: params[:page], per_page: params[:limit] || 5)
 
