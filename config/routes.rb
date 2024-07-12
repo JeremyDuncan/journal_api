@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       get 'tag_types', to: 'tags#index_tag_types'
       post 'tag_types', to: 'tags#create_tag_type'
       delete 'tag_types/:id', to: 'tags#destroy_tag_type', as: :destroy_tag_type
+      put 'tag_types/:id', to: 'tags#update_tag_type', as: :update_tag_type
     end
   end
 

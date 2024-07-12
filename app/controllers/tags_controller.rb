@@ -1,7 +1,7 @@
 class TagsController < ApplicationController
   protect_from_forgery unless: -> { request.format.json? }
   before_action :set_tag, only: [:destroy]
-  before_action :set_tag_type, only: [:destroy_tag_type]
+  before_action :set_tag_type, only: [:destroy_tag_type, :update_tag_type]
 
   # GET /tags or /tags.json
   def index
@@ -38,6 +38,20 @@ class TagsController < ApplicationController
     end
   end
 
+  # PUT /tag_types/:id or /tag_types/:id.json
+  def update_tag_type
+    if @tag_type.nil?
+      render json: { error: 'TagType not found' }, status: :not_found
+      return
+    end
+
+    if @tag_type.update(tag_type_params)
+      render json: @tag_type, status: :ok
+    else
+      render json: @tag_type.errors, status: :unprocessable_entity
+    end
+  end
+
   # DELETE /tags/:id or /tags/:id.json
   def destroy
     @tag.destroy!
@@ -59,6 +73,8 @@ class TagsController < ApplicationController
 
   def set_tag_type
     @tag_type = TagType.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    @tag_type = nil
   end
 
   # Only allow a list of trusted parameters through.
