@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   protect_from_forgery unless: -> { request.format.json? }
-  before_action :set_post, only: %i[ show edit update destroy ]
+  before_action :set_post, only: %i[show edit update destroy]
 
   # GET /posts or /posts.json
   def index
@@ -21,7 +21,7 @@ class PostsController < ApplicationController
     end
 
     render json: {
-      posts: @posts,
+      posts: @posts.as_json(include: { tags: { include: :tag_type } }),
       total_pages: @posts.total_pages,
       current_page: @posts.current_page,
       next_page: @posts.next_page,
@@ -31,7 +31,7 @@ class PostsController < ApplicationController
 
   # GET /posts/1 or /posts/1.json
   def show
-    render json: @post
+    render json: @post.as_json(include: { tags: { include: :tag_type } })
   end
 
   # POST /posts or /posts.json
@@ -39,7 +39,13 @@ class PostsController < ApplicationController
     @post = Post.new(post_params)
 
     if @post.save
-      render json: @post, status: :created, location: @post
+      if params[:tags].present?
+        params[:tags].each do |tag_name|
+          tag = Tag.find_or_create_by(name: tag_name)
+          @post.tags << tag
+        end
+      end
+      render json: @post.as_json(include: { tags: { include: :tag_type } }), status: :created, location: @post
     else
       render json: @post.errors, status: :unprocessable_entity
     end
@@ -48,7 +54,16 @@ class PostsController < ApplicationController
   # PATCH/PUT /posts/1 or /posts/1.json
   def update
     if @post.update(post_params)
-      render json: @post, status: :ok, location: @post
+      if params[:tags].present?
+        @post.tags.clear
+        params[:tags].each do |tag_name|
+          tag = Tag.find_or_create_by(name: tag_name)
+          @post.tags << tag
+        end
+      else
+        @post.tags.clear
+      end
+      render json: @post.as_json(include: { tags: { include: :tag_type } }), status: :ok, location: @post
     else
       render json: @post.errors, status: :unprocessable_entity
     end
