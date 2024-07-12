@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
-  resources :posts
+  resources :posts do
+    collection do
+      get :search
+    end
+  end
+
   resources :tags, only: [:index, :create, :destroy] do
     collection do
       get 'tag_types', to: 'tags#index_tag_types'

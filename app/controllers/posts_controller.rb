@@ -75,6 +75,25 @@ class PostsController < ApplicationController
     head :no_content
   end
 
+
+  # GET /posts/search or /posts/search.json
+  def search
+    query = params[:query]
+    @posts = Post.joins(tags: :tag_type)
+                 .where('posts.title ILIKE :query OR posts.content ILIKE :query OR tags.name ILIKE :query OR tag_types.name ILIKE :query', query: "%#{query}%")
+                 .distinct
+                 .order(created_at: :desc)
+                 .paginate(page: params[:page], per_page: params[:limit] || 5)
+
+    render json: {
+      posts: @posts.as_json(include: { tags: { include: :tag_type } }),
+      total_pages: @posts.total_pages,
+      current_page: @posts.current_page,
+      next_page: @posts.next_page,
+      prev_page: @posts.previous_page
+    }
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.
