@@ -10,8 +10,8 @@ class PostsController < ApplicationController
     if params[:year].present? && params[:month].present?
       year = params[:year].to_i
       month = params[:month].to_i
-      start_date = Date.new(year, month, 1)
-      end_date = start_date.end_of_month
+      start_date = Time.zone.local(year, month, 1).beginning_of_day
+      end_date = start_date.end_of_month.end_of_day
       @posts = Post.where(created_at: start_date..end_date)
                    .includes(tags: :tag_type) # Preload associations to avoid N+1 queries
                    .order(created_at: :desc)
