@@ -1,10 +1,10 @@
 # config/initializers/cors.rb
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins '*'  # Replace with your frontend URL
+    origins '*'
     resource '*',
              headers: :any,
-             methods: [:get, :post, :put, :patch, :delete, :options, :head] #,
-             # credentials: true
+             methods: [:get, :post, :put, :patch, :delete, :options, :head],
+             expose: ['access-token', 'expiry', 'token-type', 'uid', 'client']
   end
 end

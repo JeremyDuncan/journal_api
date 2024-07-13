@@ -1,5 +1,4 @@
 class PostsController < ApplicationController
-  protect_from_forgery unless: -> { request.format.json? }
   before_action :set_post, only: %i[show edit update destroy]
 
   # GET /posts or /posts.json

@@ -1,5 +1,4 @@
 class TagsController < ApplicationController
-  protect_from_forgery unless: -> { request.format.json? }
   before_action :set_tag, only: [:destroy]
   before_action :set_tag_type, only: [:destroy_tag_type, :update_tag_type]
 
