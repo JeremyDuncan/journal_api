@@ -38,7 +38,12 @@ class PostsController < ApplicationController
 
   # POST /posts or /posts.json
   def create
-    @post = Post.new(post_params)
+    # Check if created_at is present in the parameters
+    if params[:created_at].present?
+      @post = Post.new(post_params.merge(created_at: params[:created_at]))
+    else
+      @post = Post.new(post_params)
+    end
 
     if @post.save
       if params[:tags].present?
@@ -73,8 +78,18 @@ class PostsController < ApplicationController
 
   # DELETE /posts/1 or /posts/1.json
   def destroy
-    @post.destroy!
-    head :no_content
+    @post.transaction do
+      @post.post_tags.destroy_all
+      @post.destroy
+    end
+
+    respond_to do |format|
+      format.json { head :no_content }
+    end
+  rescue ActiveRecord::RecordNotDestroyed => e
+    respond_to do |format|
+      format.json { render json: { error: e.message }, status: :unprocessable_entity }
+    end
   end
 
   # GET /posts/search or /posts/search.json
@@ -104,7 +119,11 @@ class PostsController < ApplicationController
   end
 
   # Only allow a list of trusted parameters through.
+  # def post_params
+  #   params.require(:post).permit(:title, :content)
+  # end
+
   def post_params
-    params.require(:post).permit(:title, :content)
+    params.require(:post).permit(:title, :content, :created_at, tags: [])
   end
 end
