@@ -1,4 +1,11 @@
 Rails.application.routes.draw do
+  devise_for :users, controllers: {
+    sessions: 'users/sessions',
+    registrations: 'users/registrations'
+  }
+  get 'users/exists', to: 'users#exists'
+
+
   resources :posts do
     collection do
       get :search
