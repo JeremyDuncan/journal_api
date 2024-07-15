@@ -4,13 +4,13 @@ class TagsController < ApplicationController
 
   # GET /tags or /tags.json
   def index
-    @tags = Tag.all
+    @tags = Tag.joins(:tag_type).order('tag_types.name ASC, tags.name ASC')
     render json: @tags.as_json(include: :tag_type)
   end
 
   # GET /tag_types or /tag_types.json
   def index_tag_types
-    @tag_types = TagType.all
+    @tag_types = TagType.all.order('tag_types.name ASC')
     render json: @tag_types
   end
 
