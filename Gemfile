@@ -42,7 +42,7 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
 
 
-gem 'rack-cors'
+gem 'rack-cors', :require => 'rack/cors'
 
 gem 'will_paginate'
 
