@@ -94,7 +94,8 @@ class PostsController < ApplicationController
   # GET /posts/search or /posts/search.json
   def search
     query = params[:query]
-    @posts = Post.joins(tags: :tag_type)
+
+    @posts = Post.left_outer_joins(tags: :tag_type)
                  .where('posts.title ILIKE :query OR posts.content ILIKE :query OR tags.name ILIKE :query OR tag_types.name ILIKE :query', query: "%#{query}%")
                  .distinct
                  .includes(tags: :tag_type) # Preload associations to avoid N+1 queries
