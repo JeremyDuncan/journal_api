@@ -30,6 +30,11 @@ class PostsController < ApplicationController
     }
   end
 
+  def all_posts
+    @posts = Post.includes(tags: :tag_type).order(created_at: :desc)
+    render json: @posts.as_json(include: { tags: { include: :tag_type } })
+  end
+
   # GET /posts/1 or /posts/1.json
   def show
     render json: @post.as_json(include: { tags: { include: :tag_type } })
